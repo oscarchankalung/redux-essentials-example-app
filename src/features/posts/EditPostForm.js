@@ -7,9 +7,7 @@ import { postsActions, postsSelectors } from './postsSlice'
 export const EditPostForm = ({ match }) => {
   const { postId } = match.params
 
-  const post = useSelector((state) =>
-    postsSelectors.selectPostById(state, postId)
-  )
+  const post = useSelector((state) => postsSelectors.selectById(state, postId))
 
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)

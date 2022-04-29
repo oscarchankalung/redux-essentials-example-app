@@ -11,9 +11,7 @@ import { TimeAgo } from './TimeAgo'
 export const SinglePostPage = ({ match }) => {
   const { postId } = match.params
 
-  const post = useSelector((state) =>
-    postsSelectors.selectPostById(state, postId)
-  )
+  const post = useSelector((state) => postsSelectors.selectById(state, postId))
 
   if (!post) {
     return (

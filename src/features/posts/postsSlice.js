@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, nanoid } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { client } from '../../api/client'
 
 const initialState = {
@@ -24,16 +24,6 @@ const postsSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
-    postAdded(state, action) {
-      state.posts.push({
-        id: nanoid(),
-        date: new Date().toISOString(),
-        title: action.payload.title,
-        content: action.payload.content,
-        user: action.payload.userId,
-        reactions: { thumbsUp: 0, hooray: 0, heart: 0, rocket: 0, eyes: 0 },
-      })
-    },
     postUpdated(state, action) {
       const { id, title, content } = action.payload
       const existingPost = state.posts.find((post) => post.id === id)
@@ -52,19 +42,21 @@ const postsSlice = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchPosts.pending, (state, action) => {
-        state.status = 'loading'
-      })
-      .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        state.posts = state.posts.concat(action.payload)
-      })
-      .addCase(fetchPosts.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.error.message
-      })
+  extraReducers: {
+    [fetchPosts.pending]: (state, action) => {
+      state.status = 'loading'
+    },
+    [fetchPosts.fulfilled]: (state, action) => {
+      state.status = 'succeeded'
+      state.posts = state.posts.concat(action.payload)
+    },
+    [fetchPosts.rejected]: (state, action) => {
+      state.status = 'failed'
+      state.error = action.error.message
+    },
+    [addNewPost.fulfilled]: (state, action) => {
+      state.posts.push(action.payload)
+    },
   },
 })
 
@@ -73,7 +65,7 @@ export const postsActions = postsSlice.actions
 export default postsSlice.reducer
 
 export const postsSelectors = {
-  selectAllPosts: (state) => state.posts.posts,
-  selectPostById: (state, postId) =>
+  selectAll: (state) => state.posts.posts,
+  selectById: (state, postId) =>
     state.posts.posts.find((post) => post.id === postId),
 }
