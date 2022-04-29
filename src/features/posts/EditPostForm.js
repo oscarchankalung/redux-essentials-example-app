@@ -30,16 +30,16 @@ export const EditPostForm = ({ match }) => {
     <section>
       <h2>Edit Posts</h2>
       <form>
-        <label htmlFor="postTitle">Post Title:</label>
+        <label htmlFor="postTitle">Title:</label>
         <input
           type="text"
           id="postTitle"
           name="postTitle"
-          placeholder="What's on your mind"
           value={title}
+          placeholder="What's on your mind"
           onChange={onTitleChanged}
         ></input>
-        <label htmlFor="postContent">Post Content:</label>
+        <label htmlFor="postContent">Content:</label>
         <textarea
           id="postContent"
           name="postContent"

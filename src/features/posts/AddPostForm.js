@@ -36,20 +36,21 @@ export const AddPostForm = () => {
     <section>
       <h2>Add a New Posts</h2>
       <form>
-        <label htmlFor="postTitle">Post Title:</label>
+        <label htmlFor="postTitle">Title:</label>
         <input
           type="text"
           id="postTitle"
           name="postTitle"
           value={title}
+          placeholder="What's on your mind"
           onChange={onTitleChanged}
         ></input>
-        <label htmlFor="postAuthor">Post Author:</label>
+        <label htmlFor="postAuthor">Author:</label>
         <select id="postAuthor" value={userId} onChange={onAuthorChanged}>
           <option value=""></option>
           {usersOptions}
         </select>
-        <label htmlFor="postContent">Post Content:</label>
+        <label htmlFor="postContent">Content:</label>
         <textarea
           id="postContent"
           name="postContent"
