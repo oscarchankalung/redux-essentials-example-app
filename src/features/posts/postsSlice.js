@@ -4,7 +4,7 @@ import { sub } from 'date-fns'
 const initialState = [
   {
     id: '1',
-    user: '',
+    user: '1',
     date: sub(new Date(), { minutes: 10 }).toISOString(),
     title: 'First Post',
     content: 'Hello',
@@ -12,7 +12,7 @@ const initialState = [
   },
   {
     id: '2',
-    user: '',
+    user: '2',
     date: sub(new Date(), { minutes: 5 }).toISOString(),
     title: 'Second Post',
     content: 'More',
