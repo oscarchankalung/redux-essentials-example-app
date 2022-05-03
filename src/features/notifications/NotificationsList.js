@@ -16,7 +16,7 @@ export const NotificationsList = () => {
 
   useLayoutEffect(() => {
     dispatch(notificationsActions.allNotificationsRead())
-  })
+  }, [dispatch, notifications.length])
 
   const renderedNotifications = notifications.map((notification) => {
     const date = parseISO(notification.date)
