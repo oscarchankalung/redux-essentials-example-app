@@ -1,81 +1,59 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-} from '@reduxjs/toolkit'
-import { client } from '../../api/client'
+import { apiSlice } from '../api/apiSlice'
 
-const postsAdapter = createEntityAdapter({
-  sortComparer: (a, b) => b.date.localeCompare(a.date),
+export const postsApi = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getPosts: builder.query({
+      query: () => '/posts',
+      providesTags: (result = [], error, arg) => [
+        'Post',
+        ...result.map(({ id }) => ({ type: 'Post', id })),
+      ],
+    }),
+    getPost: builder.query({
+      query: (postId) => `/posts/${postId}`,
+      providesTags: (result, error, arg) => [
+        { type: 'Post', id: arg },
+        { type: 'Post', id: 'LIST' },
+      ],
+    }),
+    addNewPost: builder.mutation({
+      query: (initialPost) => ({
+        url: '/posts',
+        method: 'POST',
+        body: initialPost,
+      }),
+      invalidatesTags: [{ type: 'Post', id: 'LIST' }],
+    }),
+    editPost: builder.mutation({
+      query: (post) => ({
+        url: `/posts/${post.id}`,
+        method: 'PATCH',
+        body: post,
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Post', id: arg.id }],
+    }),
+    addReaction: builder.mutation({
+      query: ({ postId, reaction }) => ({
+        url: `posts/${postId}/reactions`,
+        method: 'POST',
+        body: { reaction },
+      }),
+      async onQueryStarted({ postId, reaction }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getPosts', undefined, (draft) => {
+            const post = draft.find((post) => post.id === postId)
+            if (post) {
+              post.reactions[reaction]++
+            }
+          })
+        )
+
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.undo()
+        }
+      },
+    }),
+  }),
 })
-
-const initialState = postsAdapter.getInitialState({
-  status: 'idle',
-  error: null,
-})
-
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
-  const response = await client.get('/fakeApi/posts')
-  return response.data
-})
-
-export const addNewPost = createAsyncThunk(
-  'posts/addNewPost',
-  async (initialPost) => {
-    const response = await client.post('/fakeApi/posts', initialPost)
-    return response.data
-  }
-)
-
-const postsSlice = createSlice({
-  name: 'posts',
-  initialState,
-  reducers: {
-    postUpdated(state, action) {
-      const { id, title, content } = action.payload
-      const existingPost = state.entities[id]
-
-      if (existingPost) {
-        existingPost.title = title
-        existingPost.content = content
-      }
-    },
-    reactionAdded(state, action) {
-      const { postId, reaction } = action.payload
-      const existingPost = state.entities[postId]
-
-      if (existingPost) {
-        existingPost.reactions[reaction]++
-      }
-    },
-  },
-  extraReducers: {
-    [fetchPosts.pending]: (state, action) => {
-      state.status = 'loading'
-    },
-    [fetchPosts.fulfilled]: (state, action) => {
-      state.status = 'succeeded'
-      postsAdapter.upsertMany(state, action.payload)
-    },
-    [fetchPosts.rejected]: (state, action) => {
-      state.status = 'failed'
-      state.error = action.error.message
-    },
-    [addNewPost.fulfilled]: (state, action) => {
-      postsAdapter.addOne(state, action.payload)
-    },
-  },
-})
-
-export const postsActions = postsSlice.actions
-
-export default postsSlice.reducer
-
-export const postsSelectors = {
-  ...postsAdapter.getSelectors((state) => state.posts),
-  selectByUser: createSelector(
-    [(state) => state.posts.posts, (state, userId) => userId],
-    (posts, userId) => posts.filter((post) => post.user === userId)
-  ),
-}

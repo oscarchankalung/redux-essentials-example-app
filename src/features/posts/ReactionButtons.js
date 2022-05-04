@@ -1,5 +1,6 @@
 import React from 'react'
-import { useAddReactionMutation } from '../api/apiSlice'
+
+import { postsApi } from './postsSlice'
 
 const reactionEmoji = {
   thumbsUp: '👍',
@@ -10,7 +11,7 @@ const reactionEmoji = {
 }
 
 export const ReactionButtons = ({ post }) => {
-  const [addReaction] = useAddReactionMutation()
+  const [addReaction] = postsApi.useAddReactionMutation()
 
   const reactionButtons = Object.entries(reactionEmoji).map(
     ([reactionName, emoji]) => {

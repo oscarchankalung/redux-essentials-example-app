@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 
-import { useEditPostMutation, useGetPostQuery } from '../api/apiSlice'
+import { postsApi } from './postsSlice'
 
 import { Spinner } from '../../components/Spinner'
 
 export const EditPostForm = ({ match }) => {
   const { postId } = match.params
 
-  const { data: post } = useGetPostQuery(postId)
-  const [updatePost, { isLoading }] = useEditPostMutation()
+  const { data: post } = postsApi.useGetPostQuery(postId)
+  const [updatePost, { isLoading }] = postsApi.useEditPostMutation()
 
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)

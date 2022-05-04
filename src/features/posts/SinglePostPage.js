@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import { useGetPostQuery } from '../api/apiSlice'
+import { postsApi } from './postsSlice'
 
 import { Spinner } from '../../components/Spinner'
 import { PostAuthor } from './PostAuthor'
@@ -17,7 +17,7 @@ export const SinglePostPage = ({ match }) => {
     isSuccess,
     isError,
     error,
-  } = useGetPostQuery(postId)
+  } = postsApi.useGetPostQuery(postId)
 
   let content
 

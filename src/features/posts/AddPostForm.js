@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { useAddNewPostMutation } from '../api/apiSlice'
 import { usersSelectors } from '../users/usersSlice'
+import { postsApi } from './postsSlice'
 
 export const AddPostForm = () => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [userId, setUserId] = useState('')
 
-  const [addNewPost, { isLoading }] = useAddNewPostMutation()
+  const [addNewPost, { isLoading }] = postsApi.useAddNewPostMutation()
 
   const users = useSelector(usersSelectors.selectAll)
 

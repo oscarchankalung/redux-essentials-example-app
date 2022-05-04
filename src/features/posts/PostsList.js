@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 
-import { useGetPostsQuery } from '../api/apiSlice'
+import { postsApi } from './postsSlice'
 
 import { Spinner } from '../../components/Spinner'
 import { PostAuthor } from './PostAuthor'
@@ -36,7 +36,7 @@ export const PostsList = () => {
     isError,
     error,
     refetch,
-  } = useGetPostsQuery()
+  } = postsApi.useGetPostsQuery()
 
   const sortedPosts = useMemo(() => {
     const sortedPosts = posts.slice()
