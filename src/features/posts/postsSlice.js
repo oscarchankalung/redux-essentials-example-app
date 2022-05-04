@@ -16,15 +16,12 @@ export const postsApi = apiSlice.injectEndpoints({
       },
       providesTags: (result = initialState, error, arg) => [
         'Post',
-        ...result.ids.map(({ id }) => ({ type: 'Post', id })),
+        ...result.ids.map((id) => ({ type: 'Post', id })),
       ],
     }),
     getPost: builder.query({
       query: (postId) => `/posts/${postId}`,
-      providesTags: (result, error, arg) => [
-        { type: 'Post', id: arg },
-        { type: 'Post', id: 'LIST' },
-      ],
+      providesTags: (result, error, arg) => [{ type: 'Post', id: arg }],
     }),
     addNewPost: builder.mutation({
       query: (initialPost) => ({
@@ -32,7 +29,7 @@ export const postsApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: initialPost,
       }),
-      invalidatesTags: [{ type: 'Post', id: 'LIST' }],
+      invalidatesTags: ['Post'],
     }),
     editPost: builder.mutation({
       query: (post) => ({
