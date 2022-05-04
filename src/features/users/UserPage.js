@@ -31,18 +31,19 @@ export const UserPage = ({ match }) => {
     </li>
   ))
 
-  let content
-
-  if (user) {
-    content = (
-      <Fragment>
-        <h2>{user.name}</h2>
-
-        <ul>{postTitles}</ul>
-      </Fragment>
+  if (!user) {
+    return (
+      <sectio>
+        <h2>User not found!</h2>
+      </sectio>
     )
-  } else {
-    content = <h2>User not found</h2>
   }
-  return <section>{content}</section>
+
+  return (
+    <section>
+      <h2>{user.name}</h2>
+
+      <ul>{postTitles}</ul>
+    </section>
+  )
 }
