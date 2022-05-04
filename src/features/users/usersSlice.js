@@ -2,11 +2,13 @@ import { createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 import { apiSlice } from '../api/apiSlice'
 
-const usersAdapter = createEntityAdapter()
+const usersAdapter = createEntityAdapter({
+  sortComparer: (a, b) => a.name.localeCompare(b.name),
+})
 
 const initialState = usersAdapter.getInitialState()
 
-export const extendedApiSlice = apiSlice.injectEndpoints({
+export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
       query: () => '/users',
@@ -17,10 +19,8 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
   }),
 })
 
-export const { useGetUsersQuery } = extendedApiSlice
-
 const selectUsersData = createSelector(
-  extendedApiSlice.endpoints.getUsers.select(),
+  usersApi.endpoints.getUsers.select(),
   (usersResult) => usersResult.data ?? initialState
 )
 

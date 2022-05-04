@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-
 import { createSelector } from '@reduxjs/toolkit'
 
-import { useGetPostsQuery } from '../api/apiSlice'
+import { postsApi } from '../posts/postsSlice'
 import { usersSelectors } from './usersSlice'
 
 export const UserPage = ({ match }) => {
@@ -23,7 +22,7 @@ export const UserPage = ({ match }) => {
     )
   }, [])
 
-  const { postsForUser } = useGetPostsQuery(undefined, {
+  const { postsForUser } = postsApi.useGetPostsQuery(undefined, {
     selectFromResult: (result) => ({
       ...result,
       postsForUser: selectPostsForUser(result, userId),
