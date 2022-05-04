@@ -9,7 +9,7 @@ const notificationsAdapter = createEntityAdapter({
 
 const initialState = notificationsAdapter.getInitialState()
 
-export const notificationApi = apiSlice.injectEndpoints({
+export const notificationsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getNotifications: builder.query({
       query: () => '/notifications',
@@ -73,12 +73,12 @@ export const notificationApi = apiSlice.injectEndpoints({
 })
 
 const selectNotificationsData = createSelector(
-  notificationApi.endpoints.getNotifications.select(),
-  (notificationResult) => notificationResult.data ?? initialState
+  notificationsApi.endpoints.getNotifications.select(),
+  (notificationsResult) => notificationsResult.data ?? initialState
 )
 
 export const notificationsSelectors = notificationsAdapter.getSelectors(
-  (state) => selectNotificationsData(state) ?? initialState
+  (state) => selectNotificationsData(state)
 )
 
 export const fetchNotificationsWebsocket = () => (dispatch, getState) => {
@@ -88,7 +88,7 @@ export const fetchNotificationsWebsocket = () => (dispatch, getState) => {
   forceGenerateNotifications(latestTimestamp)
 }
 
-export const readAllNotifications = notificationApi.util.updateQueryData(
+export const readAllNotifications = notificationsApi.util.updateQueryData(
   'getNotifications',
   undefined,
   (draft) => {

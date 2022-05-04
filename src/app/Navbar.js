@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
-  notificationApi,
+  notificationsApi,
   fetchNotificationsWebsocket,
   notificationsSelectors,
 } from '../features/notifications/notificationsSlice'
@@ -10,7 +10,7 @@ import {
 export const Navbar = () => {
   const dispatch = useDispatch()
 
-  notificationApi.useGetNotificationsQuery()
+  notificationsApi.useGetNotificationsQuery()
 
   const notifications = useSelector(notificationsSelectors.selectAll)
   const numUnreadNotifications = notifications.filter((n) => !n.read).length
