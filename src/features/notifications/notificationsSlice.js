@@ -1,20 +1,30 @@
-import {
-  createAction,
-  createEntityAdapter,
-  createSlice,
-  createSelector,
-  isAnyOf,
-} from '@reduxjs/toolkit'
+import { createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 import { forceGenerateNotifications } from '../../api/server'
 import { apiSlice } from '../api/apiSlice'
 
-const notificationReceived = createAction('notifications/notificationsReceived')
+const notificationsAdapter = createEntityAdapter({
+  sortComparer: (a, b) => b.date.localeCompare(a.date),
+})
 
-export const extendedApi = apiSlice.injectEndpoints({
+const initialState = notificationsAdapter.getInitialState()
+
+export const notificationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getNotifications: builder.query({
       query: () => '/notifications',
+      transformResponse: (notifications) => {
+        const notificationsWithMetadata = notifications.map((notification) => ({
+          ...notification,
+          read: false,
+          isNew: true,
+        }))
+
+        return notificationsAdapter.setAll(
+          initialState,
+          notificationsWithMetadata
+        )
+      },
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
@@ -26,10 +36,23 @@ export const extendedApi = apiSlice.injectEndpoints({
           switch (message.type) {
             case 'notifications': {
               updateCachedData((draft) => {
-                draft.push(...message.payload)
-                draft.sort((a, b) => b.date.localeCompare(a.date))
+                const notificationsWithMetadata = message.payload.map(
+                  (notification) => ({
+                    ...notification,
+                    read: false,
+                    isNew: true,
+                  })
+                )
+
+                Object.values(draft.entities).forEach((notification) => {
+                  notification.isNew = !notification.read
+                })
+
+                notificationsAdapter.upsertMany(
+                  draft,
+                  notificationsWithMetadata
+                )
               })
-              dispatch(notificationReceived(message.payload))
               break
             }
             default:
@@ -49,69 +72,28 @@ export const extendedApi = apiSlice.injectEndpoints({
   }),
 })
 
-export const { useGetNotificationsQuery } = extendedApi
-
-const emptyNotifications = []
-
-export const selectNotificationsResult =
-  extendedApi.endpoints.getNotifications.select()
-
 const selectNotificationsData = createSelector(
-  selectNotificationsResult,
-  (notificationResult) => notificationResult.data ?? emptyNotifications
+  notificationApi.endpoints.getNotifications.select(),
+  (notificationResult) => notificationResult.data ?? initialState
 )
 
-///
+export const notificationsSelectors = notificationsAdapter.getSelectors(
+  (state) => selectNotificationsData(state) ?? initialState
+)
+
 export const fetchNotificationsWebsocket = () => (dispatch, getState) => {
-  const allNotifications = selectNotificationsData(getState())
+  const allNotifications = notificationsSelectors.selectAll(getState())
   const [latestNotification] = allNotifications
   const latestTimestamp = latestNotification?.date ?? ''
   forceGenerateNotifications(latestTimestamp)
 }
-///
 
-const notificationsAdapter = createEntityAdapter()
-// {sortComparer: (a, b) => b.date.localeCompare(a.date)}
-
-const initialState = notificationsAdapter.getInitialState()
-
-const matchNotificationsReceived = isAnyOf(
-  notificationReceived,
-  extendedApi.endpoints.getNotifications.matchFulfilled
-)
-
-const notificationsSlice = createSlice({
-  name: 'notifications',
-  initialState,
-  reducers: {
-    allNotificationsRead(state, action) {
-      Object.values(state.entities).forEach((notification) => {
-        notification.read = true
-      })
-    },
-  },
-  extraReducers(builder) {
-    builder.addMatcher(matchNotificationsReceived, (state, action) => {
-      const notificationMetadata = action.payload.map((notification) => ({
-        id: notification.id,
-        read: false,
-        isNew: true,
-      }))
-
-      Object.values(state.entities).forEach((notification) => {
-        notification.isNew = !notification.read
-      })
-
-      notificationsAdapter.upsertMany(state, notificationMetadata)
+export const readAllNotifications = notificationApi.util.updateQueryData(
+  'getNotifications',
+  undefined,
+  (draft) => {
+    Object.values(draft.entities).forEach((notification) => {
+      notification.read = true
     })
-  },
-})
-
-export const notificationsActions = notificationsSlice.actions
-
-export default notificationsSlice.reducer
-
-export const {
-  selectAll: selectNotificationsMetadata,
-  selectEntities: selectNotificationsMetadataEntities,
-} = notificationsAdapter.getSelectors((state) => state.notifications)
+  }
+)

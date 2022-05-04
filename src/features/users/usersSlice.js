@@ -10,8 +10,8 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
       query: () => '/users',
-      transformResponse: (responseData) => {
-        return usersAdapter.setAll(initialState, responseData)
+      transformResponse: (users) => {
+        return usersAdapter.setAll(initialState, users)
       },
     }),
   }),
@@ -19,11 +19,9 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
 
 export const { useGetUsersQuery } = extendedApiSlice
 
-export const selectUsersResult = extendedApiSlice.endpoints.getUsers.select()
-
 const selectUsersData = createSelector(
-  selectUsersResult,
-  (usersResult) => usersResult.data
+  extendedApiSlice.endpoints.getUsers.select(),
+  (usersResult) => usersResult.data ?? initialState
 )
 
 export const usersSelectors = usersAdapter.getSelectors(

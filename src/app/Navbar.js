@@ -2,20 +2,18 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
+  notificationApi,
   fetchNotificationsWebsocket,
-  selectNotificationsMetadata,
-  useGetNotificationsQuery,
+  notificationsSelectors,
 } from '../features/notifications/notificationsSlice'
 
 export const Navbar = () => {
   const dispatch = useDispatch()
 
-  useGetNotificationsQuery()
+  notificationApi.useGetNotificationsQuery()
 
-  const notificationsMetadata = useSelector(selectNotificationsMetadata)
-  const numUnreadNotifications = notificationsMetadata.filter(
-    (n) => !n.read
-  ).length
+  const notifications = useSelector(notificationsSelectors.selectAll)
+  const numUnreadNotifications = notifications.filter((n) => !n.read).length
 
   const fetchNewNotifications = () => {
     dispatch(fetchNotificationsWebsocket())
