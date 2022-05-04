@@ -43,7 +43,6 @@ const postsSlice = createSlice({
     },
     reactionAdded(state, action) {
       const { postId, reaction } = action.payload
-      console.log(action.payload, state.posts)
       const existingPost = state.entities[postId]
 
       if (existingPost) {

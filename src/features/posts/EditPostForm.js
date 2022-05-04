@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import { useEditPostMutation, useGetPostQuery } from '../api/apiSlice'
+
+import { Spinner } from '../../components/Spinner'
 
 export const EditPostForm = ({ match }) => {
   const { postId } = match.params
@@ -44,9 +45,10 @@ export const EditPostForm = ({ match }) => {
           value={content}
           onChange={onContentChanged}
         ></textarea>
-        <button type="button" onClick={onSavePostClicked}>
+        <button type="button" onClick={onSavePostClicked} disabled={isLoading}>
           Save Post
         </button>
+        {isLoading && <Spinner text="Saving..." />}
       </form>
     </section>
   )
