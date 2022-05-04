@@ -24,6 +24,6 @@ const selectUsersData = createSelector(
   (usersResult) => usersResult.data ?? initialState
 )
 
-export const usersSelectors = usersAdapter.getSelectors(
-  (state) => selectUsersData(state) ?? initialState
+export const usersSelectors = usersAdapter.getSelectors((state) =>
+  selectUsersData(state)
 )
