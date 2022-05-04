@@ -27,7 +27,7 @@ export const notificationsApi = apiSlice.injectEndpoints({
       },
       async onCacheEntryAdded(
         arg,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
         const ws = new WebSocket('ws://localhost')
 
