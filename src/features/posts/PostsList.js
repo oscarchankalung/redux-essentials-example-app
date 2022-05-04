@@ -1,15 +1,18 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import classNames from 'classnames'
 
-import { postsApi } from './postsSlice'
+import { postsApi, postsSelector } from './postsSlice'
 
 import { Spinner } from '../../components/Spinner'
 import { PostAuthor } from './PostAuthor'
 import { TimeAgo } from './TimeAgo'
 import { ReactionButtons } from './ReactionButtons'
 
-const PostExcerpt = ({ post }) => {
+const PostExcerpt = ({ postId }) => {
+  const post = useSelector((state) => postsSelector.selectById(state, postId))
+
   return (
     <article className="post-excerpt" key={post.id}>
       <h3>{post.title}</h3>
@@ -28,29 +31,17 @@ const PostExcerpt = ({ post }) => {
 }
 
 export const PostsList = () => {
-  const {
-    data: posts = [],
-    isLoading,
-    isFetching,
-    isSuccess,
-    isError,
-    error,
-    refetch,
-  } = postsApi.useGetPostsQuery()
-
-  const sortedPosts = useMemo(() => {
-    const sortedPosts = posts.slice()
-    sortedPosts.sort((a, b) => b.date.localeCompare(a.date))
-    return sortedPosts
-  }, [posts])
+  const { isLoading, isFetching, isSuccess, isError, error, refetch } =
+    postsApi.useGetPostsQuery()
+  const postIds = useSelector(postsSelector.selectIds)
 
   let content
 
   if (isLoading) {
     content = <Spinner text="Loading..." />
   } else if (isSuccess) {
-    const renderedPosts = sortedPosts.map((post) => (
-      <PostExcerpt key={post.id} post={post} />
+    const renderedPosts = postIds.map((postId) => (
+      <PostExcerpt key={postId} postId={postId} />
     ))
 
     const containerClassname = classNames('posts-container', {
