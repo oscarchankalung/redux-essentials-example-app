@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { createSelector } from '@reduxjs/toolkit'
 
-import { postsApi } from '../posts/postsSlice'
+import { postsSelector } from '../posts/postsSlice'
 import { usersSelectors } from './usersSlice'
 
 export const UserPage = ({ match }) => {
@@ -15,19 +15,15 @@ export const UserPage = ({ match }) => {
     const emptyArray = []
 
     return createSelector(
-      (res) => res.data,
-      (res, userId) => userId,
-      (data, userId) =>
-        data?.filter((post) => post.user === userId) ?? emptyArray
+      (state) => postsSelector.selectAll(state),
+      (state, userId) => userId,
+      (data, userId) => {
+        return data?.filter((post) => post.user === userId) ?? emptyArray
+      }
     )
   }, [])
 
-  const { postsForUser } = postsApi.useGetPostsQuery(undefined, {
-    selectFromResult: (result) => ({
-      ...result,
-      postsForUser: selectPostsForUser(result, userId),
-    }),
-  })
+  const postsForUser = useSelector((state) => selectPostsForUser(state, userId))
 
   const postTitles = postsForUser.map((post) => (
     <li key={post.id}>
