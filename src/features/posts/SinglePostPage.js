@@ -37,7 +37,11 @@ export const SinglePostPage = ({ match }) => {
       </article>
     )
   } else if (isError) {
-    content = <div>{error}</div>
+    content = (
+      <h2>
+        {error.data.errorType}: {error.data.message}
+      </h2>
+    )
   }
 
   return <section>{content}</section>

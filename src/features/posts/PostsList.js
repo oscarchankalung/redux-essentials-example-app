@@ -31,9 +31,11 @@ const PostExcerpt = ({ postId }) => {
 }
 
 export const PostsList = () => {
-  const { isLoading, isFetching, isSuccess, isError, error, refetch } =
-    postsApi.useGetPostsQuery()
-  const postIds = useSelector(postsSelector.selectIds)
+  const { postIds, isLoading, isFetching, isSuccess, isError, error, refetch } =
+    {
+      postIds: useSelector(postsSelector.selectIds),
+      ...postsApi.useGetPostsQuery(),
+    }
 
   let content
 
@@ -50,7 +52,11 @@ export const PostsList = () => {
 
     content = <div className={containerClassname}>{renderedPosts}</div>
   } else if (isError) {
-    content = <div>{error}</div>
+    content = (
+      <h2>
+        {error.data.errorType}: {error.data.message}
+      </h2>
+    )
   }
 
   return (

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { Fragment, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { createSelector } from '@reduxjs/toolkit'
@@ -36,31 +36,27 @@ export const UserPage = ({ match }) => {
     </li>
   ))
 
+  let content
+
   if (isLoading) {
-    return (
-      <section>
-        <Spinner text="Loading..." />
-      </section>
-    )
+    content = <Spinner text="Loading..." />
   } else if (isSuccess && !user) {
-    return (
-      <section>
-        <h2>User not found!</h2>
-      </section>
-    )
+    content = <h2>User not found!</h2>
   } else if (isSuccess && user) {
-    return (
-      <section>
+    content = (
+      <Fragment>
         <h2>{user.name}</h2>
 
         <ul>{postTitles}</ul>
-      </section>
+      </Fragment>
     )
   } else if (isError) {
-    return (
-      <section>
-        <div>{error}</div>
-      </section>
+    content = (
+      <h2>
+        {error.data.errorType}: {error.data.message}
+      </h2>
     )
   }
+
+  return <section>{content}</section>
 }

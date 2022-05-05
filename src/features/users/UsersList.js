@@ -7,7 +7,7 @@ import { usersApi, usersSelectors } from './usersSlice'
 import { Spinner } from '../../components/Spinner'
 
 export const UsersList = () => {
-  const { users, error, isFetching, isSuccess, isError } = {
+  const { users, isFetching, isSuccess, isError, error } = {
     users: useSelector(usersSelectors.selectAll),
     ...usersApi.endpoints.getUsers.useQueryState(),
   }
@@ -25,7 +25,11 @@ export const UsersList = () => {
   } else if (isSuccess) {
     content = <ul>{renderedUsers}</ul>
   } else if (isError) {
-    content = <div>{error}</div>
+    content = (
+      <h2>
+        {error.data.errorType}: {error.data.message}
+      </h2>
+    )
   }
 
   return (
