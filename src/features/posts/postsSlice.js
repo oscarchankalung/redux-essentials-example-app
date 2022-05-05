@@ -46,9 +46,17 @@ export const postsApi = apiSlice.injectEndpoints({
         body: { reaction },
       }),
       async onQueryStarted({ postId, reaction }, { dispatch, queryFulfilled }) {
-        const patchResult = dispatch(
+        const patchPostsResult = dispatch(
           apiSlice.util.updateQueryData('getPosts', undefined, (draft) => {
             const post = draft.entities[postId]
+            if (post) {
+              post.reactions[reaction]++
+            }
+          })
+        )
+        const patchPostResult = dispatch(
+          apiSlice.util.updateQueryData('getPost', postId, (draft) => {
+            const post = draft
             if (post) {
               post.reactions[reaction]++
             }
@@ -58,7 +66,8 @@ export const postsApi = apiSlice.injectEndpoints({
         try {
           await queryFulfilled
         } catch {
-          patchResult.undo()
+          patchPostsResult.undo()
+          patchPostResult.undo()
         }
       },
     }),
